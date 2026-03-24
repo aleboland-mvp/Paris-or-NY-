@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>¿Dónde pertenece tu marca? NY vs Paris</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #fafafa; color: #111; min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 2rem 1rem; }
+.quiz-wrap { max-width: 640px; width: 100%; background: #fff; border-radius: 12px; border: 1px solid #e5e5e5; padding: 2.5rem 2rem; }
+.screen { display: none; }
+.screen.active { display: block; }
+.intro-badge { display: inline-block; font-size: 12px; font-weight: 500; padding: 4px 12px; border-radius: 20px; background: #f4f4f4; border: 1px solid #e0e0e0; color: #666; margin-bottom: 1.5rem; }
+.intro-title { font-size: 26px; font-weight: 600; color: #111; line-height: 1.3; margin-bottom: 1rem; }
+.intro-sub { font-size: 15px; color: #555; line-height: 1.7; margin-bottom: 1.5rem; }
+.btn-primary { display: inline-block; padding: 12px 28px; background: #111; color: #fff; border: none; border-radius: 8px; font-size: 15px; font-weight: 500; cursor: pointer; transition: opacity 0.15s; font-family: inherit; }
+.btn-primary:hover { opacity: 0.82; }
+.btn-secondary { display: inline-block; padding: 10px 22px; background: transparent; color: #111; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; cursor: pointer; transition: background 0.15s; font-family: inherit; }
+.btn-secondary:hover { background: #f4f4f4; }
+.progress-label { font-size: 12px; color: #999; margin-bottom: 6px; }
+.progress-bar { height: 3px; background: #eee; border-radius: 2px; margin-bottom: 2rem; }
+.progress-fill { height: 3px; background: #111; border-radius: 2px; transition: width 0.3s; }
+.q-text { font-size: 17px; font-weight: 500; color: #111; line-height: 1.5; margin-bottom: 0.5rem; }
+.q-context { font-size: 13px; color: #999; margin-bottom: 1.25rem; font-style: italic; }
+.options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 2rem; }
+.opt { padding: 12px 16px; border: 1px solid #e5e5e5; border-radius: 8px; cursor: pointer; font-size: 14px; color: #111; transition: all 0.15s; background: #fff; text-align: left; line-height: 1.5; font-family: inherit; }
+.opt:hover { border-color: #aaa; background: #fafafa; }
+.opt.selected { border-color: #111; background: #f4f4f4; font-weight: 500; }
+.scale-wrap { margin-bottom: 2rem; }
+.scale-labels { display: flex; justify-content: space-between; font-size: 12px; color: #999; margin-bottom: 8px; }
+.scale-opts { display: flex; gap: 8px; }
+.scale-opt { flex: 1; padding: 10px 4px; border: 1px solid #e5e5e5; border-radius: 8px; cursor: pointer; font-size: 14px; color: #555; text-align: center; background: #fff; transition: all 0.15s; font-family: inherit; }
+.scale-opt:hover { border-color: #aaa; }
+.scale-opt.selected { border-color: #111; background: #f4f4f4; color: #111; font-weight: 500; }
+.nav-row { display: flex; justify-content: space-between; align-items: center; }
+.lead-form input, .lead-form select { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; color: #111; background: #fff; margin-bottom: 10px; outline: none; font-family: inherit; }
+.lead-form input:focus, .lead-form select:focus { border-color: #111; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.result-badge { display: inline-block; font-size: 12px; font-weight: 500; padding: 5px 14px; border-radius: 20px; margin-bottom: 1.25rem; }
+.result-ny { background: #dbeafe; color: #1e40af; }
+.result-paris { background: #ede9fe; color: #5b21b6; }
+.result-path { background: #dcfce7; color: #166534; }
+.result-title { font-size: 22px; font-weight: 600; color: #111; line-height: 1.4; margin-bottom: 1rem; }
+.result-body { font-size: 14px; color: #555; line-height: 1.7; margin-bottom: 1.5rem; }
+.section-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #999; margin-bottom: 0.75rem; }
+.steps-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 1.5rem; }
+.step-item { padding: 12px 14px; border: 1px solid #e5e5e5; border-radius: 8px; font-size: 13px; color: #111; line-height: 1.6; }
+.step-item::before { content: "→ "; color: #999; }
+.insight-box { padding: 16px; background: #f9f9f9; font-size: 14px; color: #111; line-height: 1.7; margin-bottom: 2rem; font-style: italic; border-left: 2px solid #111; }
+.score-bar-wrap { margin-bottom: 1.5rem; }
+.score-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 13px; color: #555; }
+.score-bar { flex: 1; height: 6px; background: #eee; border-radius: 3px; overflow: hidden; }
+.score-fill-ny { background: #3b82f6; height: 6px; border-radius: 3px; transition: width 0.6s; }
+.score-fill-paris { background: #8b5cf6; height: 6px; border-radius: 3px; transition: width 0.6s; }
+.divider { border: none; border-top: 1px solid #eee; margin: 1.5rem 0; }
+@media (max-width: 480px) { .form-row { grid-template-columns: 1fr; } .quiz-wrap { padding: 1.5rem 1rem; } }
+</style>
+</head>
+<body>
+<div class="quiz-wrap">
+
+<div id="screen-intro" class="screen active">
+  <span class="intro-badge">Trade Show Readiness Quiz</span>
+  <h1 class="intro-title">¿Dónde pertenece tu marca en el mercado global?</h1>
+  <p class="intro-sub">New York y Paris representan dos filosofías distintas del negocio de la moda. Este quiz te ayuda a identificar con cuál estás naturalmente alineada — y cómo llegar ahí.</p>
+  <p class="intro-sub">15 preguntas. 5 minutos. Una dirección clara.</p>
+  <button class="btn-primary" onclick="goTo('screen-lead')">Empezar →</button>
+</div>
+
+<div id="screen-lead" class="screen">
+  <h2 style="font-size:20px;font-weight:600;margin-bottom:0.5rem;">Antes de empezar</h2>
+  <p style="font-size:14px;color:#555;margin-bottom:1.5rem;">Completá estos datos para recibir tu resultado personalizado.</p>
+  <div class="lead-form">
+    <input type="text" id="lead-brand" placeholder="Nombre de la marca" />
+    <input type="text" id="lead-founder" placeholder="Tu nombre" />
+    <input type="email" id="lead-email" placeholder="Email" />
+    <div class="form-row">
+      <select id="lead-category">
+        <option value="">Categoría</option>
+        <option>Ready-to-wear mujer</option>
+        <option>Ready-to-wear hombre</option>
+        <option>Accesorios</option>
+        <option>Joyería</option>
+        <option>Calzado</option>
+        <option>Lifestyle / deco</option>
+        <option>Otra</option>
+      </select>
+      <select id="lead-price">
+        <option value="">Rango de precio</option>
+        <option>Accesible (bajo $100)</option>
+        <option>Contemporáneo ($100–$400)</option>
+        <option>Advanced contemporary ($400–$1000)</option>
+        <option>Lujo accesible ($1000+)</option>
+      </select>
+    </div>
+    <input type="text" id="lead-markets" placeholder="Mercados actuales (ej: Argentina, México, España)" />
+  </div>
+  <div style="display:flex;gap:10px;">
+    <button class="btn-primary" onclick="startQuiz()">Continuar →</button>
+    <button class="btn-secondary" onclick="goTo('screen-intro')">Volver</button>
+  </div>
+</div>
+
+<div id="screen-quiz" class="screen">
+  <p class="progress-label" id="prog-label">Pregunta 1 de 15</p>
+  <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:6%"></div></div>
+  <p class="q-text" id="q-text"></p>
+  <p class="q-context" id="q-context"></p>
+  <div id="q-options"></div>
+  <div class="nav-row">
+    <button class="btn-secondary" id="btn-back" onclick="prevQ()">← Anterior</button>
+    <button class="btn-primary" id="btn-next" onclick="nextQ()" disabled>Siguiente →</button>
+  </div>
+</div>
+
+<div id="screen-result" class="screen">
+  <div id="result-badge-wrap"></div>
+  <div class="score-bar-wrap">
+    <div class="score-bar-row"><span style="min-width:60px">New York</span><div class="score-bar"><div class="score-fill-ny" id="bar-ny" style="width:0%"></div></div><span id="pct-ny">0%</span></div>
+    <div class="score-bar-row"><span style="min-width:60px">Paris</span><div class="score-bar"><div class="score-fill-paris" id="bar-paris" style="width:0%"></div></div><span id="pct-paris">0%</span></div>
+  </div>
+  <h2 class="result-title" id="result-title"></h2>
+  <p class="result-body" id="result-body"></p>
+  <hr class="divider">
+  <p class="section-label">Próximos pasos</p>
+  <div class="steps-list" id="result-steps"></div>
+  <hr class="divider">
+  <p class="section-label">Insight de posicionamiento</p>
+  <div class="insight-box" id="result-insight"></div>
+  <button class="btn-secondary" onclick="resetQuiz()" style="margin-top:1rem;">Volver a empezar</button>
+</div>
+
+</div>
+
+<script>
+const questions = [
+  { text: "¿Cómo describirías la identidad visual de tu marca hoy?", type: "options", options: [
+    { text: "Definida y reconocible — tenemos un universo propio", ny: 1, paris: 4 },
+    { text: "Clara pero todavía en proceso de consolidarse", ny: 2, paris: 2 },
+    { text: "Fuerte comercialmente, con estética consistente", ny: 4, paris: 1 },
+    { text: "En desarrollo — todavía la estamos construyendo", ny: 1, paris: 1 }
+  ]},
+  { text: "Cuando un buyer te pregunta '¿qué te diferencia?', tu respuesta es...", type: "options", options: [
+    { text: "Una historia, un punto de vista, una forma de ver el mundo", ny: 1, paris: 4 },
+    { text: "Precio, calidad y confiabilidad en la entrega", ny: 4, paris: 1 },
+    { text: "Una combinación de identidad y solidez operativa", ny: 3, paris: 3 },
+    { text: "Todavía no tengo una respuesta muy clara", ny: 1, paris: 0 }
+  ]},
+  { text: "¿Cuántas piezas por estilo podés producir sin comprometer calidad ni plazos?", type: "options", options: [
+    { text: "Más de 500 unidades por estilo", ny: 4, paris: 1 },
+    { text: "Entre 100 y 500", ny: 3, paris: 2 },
+    { text: "Menos de 100 — somos más small batch", ny: 1, paris: 4 },
+    { text: "No producimos por escala, sino por colección completa", ny: 1, paris: 3 }
+  ]},
+  { text: "¿Cuál es el rango de precio de venta al público de tu producto principal?", context: "Precio retail en dólares o euros.", type: "options", options: [
+    { text: "Menos de $200", ny: 3, paris: 1 },
+    { text: "Entre $200 y $600", ny: 4, paris: 2 },
+    { text: "Entre $600 y $1200", ny: 2, paris: 4 },
+    { text: "Más de $1200", ny: 1, paris: 4 }
+  ]},
+  { text: "¿Tenés experiencia previa vendiendo en el exterior?", type: "options", options: [
+    { text: "Sí, ya tengo cuentas activas en más de un país", ny: 4, paris: 4 },
+    { text: "Sí, algunas ventas pero sin estructura todavía", ny: 2, paris: 2 },
+    { text: "No, pero tenemos todo listo para arrancar", ny: 2, paris: 2 },
+    { text: "No, y somos nuevos en la idea de exportar", ny: 0, paris: 1 }
+  ]},
+  { text: "¿Cómo es tu estructura de precios para wholesale?", type: "options", options: [
+    { text: "Tenemos una línea de precios clara con márgenes definidos", ny: 4, paris: 2 },
+    { text: "Tenemos precios pero no los hemos calculado con estructura", ny: 1, paris: 1 },
+    { text: "Negociamos caso a caso", ny: 1, paris: 2 },
+    { text: "No hemos trabajado el wholesale todavía", ny: 0, paris: 1 }
+  ]},
+  { text: "¿Qué tipo de buyer te interesa más atraer?", type: "options", options: [
+    { text: "Departamentos y multimarcas con alto volumen", ny: 4, paris: 1 },
+    { text: "Boutiques de nicho con fuerte punto de vista editorial", ny: 1, paris: 4 },
+    { text: "Conceptstores y espacios curatoriales", ny: 1, paris: 4 },
+    { text: "Todo tipo — queremos volumen y prestigio", ny: 3, paris: 3 }
+  ]},
+  { text: "¿Qué tan sólido es tu proceso de producción y entrega?", context: "Considerá: lead times, cumplimiento de fechas, capacidad de reorden.", type: "scale", scaleLabels: ["No estructurado", "Muy sólido"], nyMap: [0,1,2,3,4], parisMap: [1,2,3,2,1] },
+  { text: "¿Qué tan fuerte es el storytelling de tu marca?", context: "Tu capacidad de transmitir historia, valores y punto de vista en toda comunicación.", type: "scale", scaleLabels: ["Por desarrollar", "Muy potente"], nyMap: [1,1,2,3,3], parisMap: [0,1,2,4,5] },
+  { text: "¿Tu colección tiene coherencia estética entre piezas y categorías?", type: "options", options: [
+    { text: "Sí, hay un hilo conductor muy claro en toda la colección", ny: 2, paris: 4 },
+    { text: "Bastante coherente, con alguna variación por categoría", ny: 3, paris: 2 },
+    { text: "Estamos trabajando en eso", ny: 1, paris: 1 },
+    { text: "No todavía — somos más experimentales", ny: 0, paris: 2 }
+  ]},
+  { text: "¿Qué mercado te parece más interesante para crecer en los próximos 2 años?", type: "options", options: [
+    { text: "Norteamérica — EE.UU. y Canadá", ny: 5, paris: 0 },
+    { text: "Europa — en especial Francia, Bélgica, Alemania", ny: 0, paris: 5 },
+    { text: "Medio Oriente y Asia", ny: 2, paris: 3 },
+    { text: "Abiertos a donde la marca tenga fit", ny: 2, paris: 2 }
+  ]},
+  { text: "¿Tu marca tiene presencia digital consistente (web, editorial, redes)?", type: "options", options: [
+    { text: "Sí, con identidad visual y contenido regular", ny: 3, paris: 4 },
+    { text: "Tenemos web y redes pero son inconsistentes", ny: 2, paris: 1 },
+    { text: "En construcción", ny: 1, paris: 1 },
+    { text: "No todavía", ny: 0, paris: 0 }
+  ]},
+  { text: "¿Cómo describirías tu ambición para los próximos 3 años?", type: "options", options: [
+    { text: "Escalar ventas y entrar a cuentas de alto volumen", ny: 5, paris: 1 },
+    { text: "Construir una marca de referencia con posicionamiento claro", ny: 1, paris: 5 },
+    { text: "Equilibrar crecimiento y construcción de marca", ny: 3, paris: 3 },
+    { text: "Todavía lo estamos definiendo", ny: 1, paris: 1 }
+  ]},
+  { text: "¿Tenés lookbook, line sheet o materiales de presentación listos en inglés?", type: "options", options: [
+    { text: "Sí, todo actualizado y profesional", ny: 4, paris: 3 },
+    { text: "Sí, pero mejorarían con edición", ny: 2, paris: 2 },
+    { text: "Solo en español", ny: 1, paris: 1 },
+    { text: "No tenemos materiales listos todavía", ny: 0, paris: 0 }
+  ]},
+  { text: "¿Qué te atrae más de participar en una feria internacional?", type: "options", options: [
+    { text: "Generar órdenes y abrir cuentas de volumen", ny: 5, paris: 0 },
+    { text: "Posicionar la marca y conectar con buyers que nos entiendan", ny: 0, paris: 5 },
+    { text: "Ambos — negocios y posicionamiento", ny: 3, paris: 3 },
+    { text: "Aprender el mercado y ganar visibilidad", ny: 2, paris: 2 }
+  ]}
+];
+
+let current = 0, answers = new Array(questions.length).fill(null);
+let totalNY = 0, totalParis = 0;
+
+function goTo(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function startQuiz() {
+  current = 0;
+  answers = new Array(questions.length).fill(null);
+  renderQ();
+  goTo('screen-quiz');
+}
+
+function renderQ() {
+  const q = questions[current];
+  document.getElementById('prog-label').textContent = `Pregunta ${current+1} de ${questions.length}`;
+  document.getElementById('prog-fill').style.width = `${Math.round(((current+1)/questions.length)*100)}%`;
+  document.getElementById('q-text').textContent = q.text;
+  document.getElementById('q-context').textContent = q.context || '';
+  document.getElementById('btn-back').style.visibility = current === 0 ? 'hidden' : 'visible';
+  document.getElementById('btn-next').disabled = answers[current] === null;
+  document.getElementById('btn-next').textContent = current === questions.length-1 ? 'Ver resultado →' : 'Siguiente →';
+  const container = document.getElementById('q-options');
+  container.innerHTML = '';
+  if (q.type === 'options') {
+    const div = document.createElement('div');
+    div.className = 'options';
+    q.options.forEach((opt, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'opt' + (answers[current] === i ? ' selected' : '');
+      btn.textContent = opt.text;
+      btn.onclick = () => { answers[current] = i; renderQ(); document.getElementById('btn-next').disabled = false; };
+      div.appendChild(btn);
+    });
+    container.appendChild(div);
+  } else {
+    const wrap = document.createElement('div');
+    wrap.className = 'scale-wrap';
+    const labels = document.createElement('div');
+    labels.className = 'scale-labels';
+    labels.innerHTML = `<span>${q.scaleLabels[0]}</span><span>${q.scaleLabels[1]}</span>`;
+    const opts = document.createElement('div');
+    opts.className = 'scale-opts';
+    [1,2,3,4,5].forEach((v,i) => {
+      const btn = document.createElement('button');
+      btn.className = 'scale-opt' + (answers[current] === i ? ' selected' : '');
+      btn.textContent = v;
+      btn.onclick = () => { answers[current] = i; renderQ(); document.getElementById('btn-next').disabled = false; };
+      opts.appendChild(btn);
+    });
+    wrap.appendChild(labels);
+    wrap.appendChild(opts);
+    container.appendChild(wrap);
+  }
+}
+
+function nextQ() {
+  if (answers[current] === null) return;
+  if (current === questions.length - 1) { calcResult(); return; }
+  current++;
+  renderQ();
+}
+
+function prevQ() {
+  if (current > 0) { current--; renderQ(); }
+}
+
+function calcResult() {
+  totalNY = 0; totalParis = 0;
+  questions.forEach((q, i) => {
+    const ans = answers[i];
+    if (ans === null) return;
+    if (q.type === 'options') { totalNY += q.options[ans].ny; totalParis += q.options[ans].paris; }
+    else { totalNY += q.nyMap[ans]; totalParis += q.parisMap[ans]; }
+  });
+  showResult();
+}
+
+function showResult() {
+  const total = totalNY + totalParis || 1;
+  const pctNY = Math.round((totalNY / total) * 100);
+  const pctParis = Math.round((totalParis / total) * 100);
+  setTimeout(() => {
+    document.getElementById('bar-ny').style.width = pctNY + '%';
+    document.getElementById('bar-paris').style.width = pctParis + '%';
+  }, 200);
+  document.getElementById('pct-ny').textContent = pctNY + '%';
+  document.getElementById('pct-paris').textContent = pctParis + '%';
+
+  const brand = document.getElementById('lead-brand').value || 'Tu marca';
+  const diff = totalNY - totalParis;
+  const isWeak = (totalNY + totalParis) < 20;
+  const isClose = Math.abs(diff) <= 5;
+
+  let badge, badgeClass, titleText, bodyText, stepsArr, insightText;
+
+  if (isWeak) {
+    badge = 'En construcción → NY o Paris'; badgeClass = 'result-path';
+    titleText = `${brand} está en un momento muy interesante de su desarrollo.`;
+    bodyText = `Hay potencial claro y los cimientos están. Antes de una feria internacional, vale la pena trabajar algunos puntos que van a hacer que la entrada sea mucho más poderosa — tanto operativamente como en posicionamiento.`;
+    stepsArr = ['Definir con claridad el diferencial de la marca en un párrafo. Eso es lo primero que un buyer va a querer escuchar.','Construir una estructura básica de wholesale: precios, márgenes, condiciones y mínimos de orden.','Preparar materiales de presentación en inglés: line sheet y lookbook con punto de vista editorial.','Identificar ferias regionales o showrooms de entrada para ganar experiencia antes de NY o Paris.','Definir el mercado objetivo con más precisión — eso va a orientar si el camino natural es NY o Paris.'];
+    insightText = `Las marcas que más brillan en las ferias internacionales no son siempre las más grandes — son las que saben exactamente quiénes son. ${brand} tiene algo interesante para decir. El trabajo ahora es traducirlo en un sistema que funcione afuera.`;
+  } else if (isClose) {
+    badge = 'Alineación dual: NY + Paris'; badgeClass = 'result-path';
+    titleText = `${brand} tiene potencial para los dos mercados — con foco estratégico.`;
+    bodyText = `Hay un equilibrio notable entre solidez comercial e identidad de marca. Eso es una ventaja real. La pregunta es cuál de los dos mercados querés activar primero.`;
+    stepsArr = ['Elegir un primer mercado: la misma marca no puede comunicarse igual para NY y Paris.','Si elegís NY: reforzar la estructura operativa, los lead times y la claridad de precios.','Si elegís Paris: profundizar el universo visual, el storytelling y la coherencia estética.','Considerar una participación piloto en un showroom antes de invertir en una feria completa.','Definir qué tipo de buyer querés atraer — eso va a clarificar el camino.'];
+    insightText = `${brand} tiene lo más difícil resuelto: ya tiene las dos dimensiones del negocio funcionando. Ahora el desafío es elegir con intención — no por descarte, sino por visión.`;
+  } else if (diff > 0) {
+    badge = 'New York — Coterie'; badgeClass = 'result-ny';
+    titleText = `${brand} está naturalmente alineada con el mercado de New York.`;
+    bodyText = `La marca tiene una orientación clara hacia el negocio: estructura, escalabilidad y capacidad de respuesta comercial. Coterie es el espacio donde eso tiene más valor.`;
+    stepsArr = ['Asegurarse de que el line sheet esté optimizado: precios en USD, condiciones claras, lead times específicos.','Preparar un brief de marca de una página que comunique el diferencial en menos de 60 segundos.','Investigar el buyer mix de Coterie e identificar las cuentas más relevantes.','Trabajar el merchandising visual del stand para que el producto comunique sell-through.','Tener respuesta lista para preguntas sobre reorden y capacidad de producción escalada.'];
+    insightText = `${brand} tiene la mentalidad comercial que NY valora. El trabajo ahora es comunicarlo con la misma claridad con que lo opera.`;
+  } else {
+    badge = "Paris — Première Classe / Who's Next"; badgeClass = 'result-paris';
+    titleText = `${brand} tiene una afinidad natural con el universo de Paris.`;
+    bodyText = `Hay identidad fuerte, punto de vista estético y una manera propia de ver el producto. Eso es exactamente lo que los buyers europeos buscan en Première Classe y Who's Next.`;
+    stepsArr = ['Profundizar el universo visual: cada touchpoint tiene que hablar el mismo idioma.','Desarrollar un press kit con narrative de marca, no solo fichas técnicas.','Investigar boutiques y conceptstores europeos que trabajen marcas con tu perfil.','Considerar una edición de Who\'s Next o Première Classe como primer acercamiento al mercado.','Trabajar la coherencia entre colección y comunicación — en Paris, el todo tiene que sumar.'];
+    insightText = `${brand} tiene lo que Paris busca pero no siempre encuentra: un universo propio. El desafío no es crear más — es editar mejor.`;
+  }
+
+  document.getElementById('result-badge-wrap').innerHTML = `<span class="result-badge ${badgeClass}">${badge}</span>`;
+  document.getElementById('result-title').textContent = titleText;
+  document.getElementById('result-body').textContent = bodyText;
+  document.getElementById('result-steps').innerHTML = stepsArr.map(s => `<div class="step-item">${s}</div>`).join('');
+  document.getElementById('result-insight').textContent = insightText;
+  goTo('screen-result');
+}
+
+function resetQuiz() {
+  answers = new Array(questions.length).fill(null);
+  current = 0;
+  goTo('screen-intro');
+}
+</script>
+</body>
+</html>
