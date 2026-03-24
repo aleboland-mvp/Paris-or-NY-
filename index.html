@@ -296,6 +296,23 @@ function calcResult() {
   showResult();
 }
 
+function submitToFormspree(resultLabel) {
+  const data = {
+    marca: document.getElementById('lead-brand').value,
+    nombre: document.getElementById('lead-founder').value,
+    email: document.getElementById('lead-email').value,
+    categoria: document.getElementById('lead-category').value,
+    precio: document.getElementById('lead-price').value,
+    mercados: document.getElementById('lead-markets').value,
+    resultado: resultLabel
+  };
+  fetch('https://formspree.io/f/mlgpqvlq', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    body: JSON.stringify(data)
+  });
+}
+
 function showResult() {
   const total = totalNY + totalParis || 1;
   const pctNY = Math.round((totalNY / total) * 100);
@@ -345,6 +362,7 @@ function showResult() {
   document.getElementById('result-body').textContent = bodyText;
   document.getElementById('result-steps').innerHTML = stepsArr.map(s => `<div class="step-item">${s}</div>`).join('');
   document.getElementById('result-insight').textContent = insightText;
+  submitToFormspree(badge);
   goTo('screen-result');
 }
 
